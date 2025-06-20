@@ -1,0 +1,2 @@
+firebase-config.js api 키 바꾸기
+.firebaserc "projects" 바꾸기 

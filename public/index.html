@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>V-Talk</title>
+  <link rel="stylesheet" href="style1.css">
+</head>
+
+<body>
+
+  <!-- ✅ 헤더 -->
+  <div class="header">
+    <h1>V-Talk</h1>
+    <div class="top-buttons">
+      <span id="nicknameDisplay" class="nickname-display"></span>
+      <button id="loginBtn" class="btn" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">로그인</button>
+      <div id="profileWrapper" style="display: none; position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <div id="profileDisplay" class="profile-display"></div>
+        <div><span id="profileNickname" class="profile-nickname"></span></div>
+      </div>
+      <div id="profileMenu" class="profile-menu" style="display: none;">
+        <a href="settings.html" class="profile-menu-link">설정</a>
+        <button id="friendBtn" class="profile-menu-btn">친구</button>
+        <button id="aboutBtn" class="profile-menu-btn">작품 개요</button>
+        <button id="logoutBtn" class="profile-menu-btn">로그아웃</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ 비로그인 설명 영역 -->
+  <div id="guest-info" class="sub-header">
+    <p>
+      저희는 팀원들이 효율적으로 협업할 수 있도록 돕는 웹 기반 스마트 화상 회의 플랫폼을 개발했습니다.<br><br>
+      <br>
+      채팅, 음성채팅, 파일 공유, 일정 관리 등 모든 협업 기능이 통합되어 있습니다.<br>
+    </p>
+  </div>
+
+  <!-- ✅ 로그인 후 메인 컨텐츠  id="chat-section" -->
+  <div id="mainContent" class="main-layout" style="display: none;">
+
+    <!-- ✅ 채팅방 생성 모달 -->
+    <div id="createRoomModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span class="closeBtn" id="closeCreateRoomModal">&times;</span>
+        <h2>채팅방 만들기</h2>
+        <input type="text" id="modalRoomName" placeholder="채팅방 이름을 입력해주세요"
+          style="width: 100%; margin-bottom: 16px; padding: 10px; border-radius: 6px; box-sizing: border-box;">
+
+        <h4>친구 초대</h4>
+        <ul id="modalFriendList" style="list-style: none; padding: 0; max-height: 200px; overflow-y: auto;"></ul>
+        <button id="confirmCreateRoomBtn" class="btn" style="margin-top: 16px;">채팅방 생성</button>
+      </div>
+    </div>
+
+    <!-- 🔹 친구 모달 -->
+    <div id="friendModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span class="closeFriendModal">&times;</span>
+        <h2>친구</h2>
+        <div id="friendTabs" style="display: flex; gap: 10px; margin-bottom: 20px;">
+          <button class="friendTabBtn" data-tab="add">친구 추가</button>
+          <button class="friendTabBtn" data-tab="requests">친구 요청</button>
+          <button class="friendTabBtn" data-tab="list">친구 목록</button>
+        </div>
+        <div id="friendTabContent">
+          <div class="friendTabPage" id="tab-add">
+            <h3>친구 추가</h3>
+            <input type="text" id="friendNickname" placeholder="닉네임 입력">
+            <button id="sendRequestBtn">친구 요청 보내기</button>
+          </div>
+          <div class="friendTabPage" id="tab-requests" style="display: none;">
+            <h3>받은 친구 요청</h3>
+            <ul id="friendRequests"></ul>
+          </div>
+          <div class="friendTabPage" id="tab-list" style="display: none;">
+            <h3>내 친구 목록</h3>
+            <ul id="friendList"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 친구초대 모달 -->
+    <div id="inviteModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span id="closeInviteModal" class="closeBtn">&times;</span>
+        <h3>친구 초대</h3>
+        <ul id="inviteFriendList"></ul>
+        <button id="confirmInviteBtn" class="btn">초대</button>
+      </div>
+    </div>
+
+    <!-- 🔹 작품 개요 모달 -->
+    <div id="aboutModal" class="modal" style="display: none;">
+      <div class="modal-content">
+        <span class="closeBtn">&times;</span>
+        <h2>V-Talk 작품 개요</h2>
+        <p>V-Talk는 팀원들이 효율적으로 협업할 수 있도록 돕는 웹 기반 스마트 화상 회의 플랫폼입니다!</p>
+        <ul>
+          <li>실시간 화면 공유(WebRTC)</li>
+          <li>음성 채팅</li>
+          <li>파일 공유 및 일정 관리</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 🔹 왼쪽: 채팅방 생성 및 목록 -->
+    <aside class="sidebar">
+      <div class="section-container">
+        <h3>내 채팅방</h3>
+        <ul id="myRoomsList"></ul>
+      </div>
+      <div class="section-container">
+        <h3>채팅방 멤버</h3>
+        <ul id="memberList"></ul>
+      </div>
+    </aside>
+
+    <!-- 🔹 가운데: 채팅창 -->
+    <main class="chat-main">
+      <div class="chat-header">
+        <h3 id="currentRoomName">채팅방을 선택해 주세요.</h3>
+        <div class="chat-header-buttons">
+          <button id="openCreateRoomModalBtn" class="btn-action">+ 채팅방 만들기</button>
+          <button id="inviteFriendBtn" class="btn-action">+ 친구 초대</button>
+        </div>
+      </div>
+      <div id="videoContainer" autoplay style="display: none;">
+        <video id="localVideo" autoplay muted playsinline style="display: none;"></video>
+        <video id="screenVideo" autoplay muted playsinline style="display: none;"></video>
+        <video id="remoteVideo" autoplay playsinline muted></video>
+      </div>
+
+      <div id="chatMessages" class="chat-box"></div>
+
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="메시지 입력">
+        <button id="sendChatBtn" class="btn">전송</button>
+      </div>
+      <!-- ✅ 화면 공유 버튼 -->
+      <div id="screen-share-controls" style="margin-top: 10px;">
+        <button id="startScreenShareBtn" class="btn">화면 공유 시작</button>
+        <button id="endScreenShareBtn" class="btn" style="display: none;">화면 공유 종료</button>
+        <span id="screen-share-status">화면 공유: 대기 중</span>
+      </div>
+      <div style="margin-top: 10px; display: flex; gap: 10px;">
+        <div id="audio-controls">
+          <button id="startAudioChatBtn" class="btn">음성 채팅 시작</button>
+          <button id="endAudioChatBtn" class="btn">종료</button>
+          <span id="audio-chat-status">음성 채팅 상태: 대기 중</span>
+        </div>
+      </div>
+
+      <!--추가한 부분-->
+      <div id="fileControls">
+        <button id="uploadBtn">파일 업로드</button>
+        <button id="showFilesBtn">파일 목록 보기</button>
+        <input type="file" id="fileInput" style="display: none;" />
+        <div id="fileNameDisplay"></div>
+        <ul id="fileList"></ul>
+      </div>
+    </main>
+
+    <!-- 🔹 오른쪽: 캘린더 -->
+    <aside style="width: 300px;">
+      <div class="calendar-container">
+        <div class="calendar-header">
+          <button id="prevMonth">&lt;</button>
+          <span id="currentMonth"></span>
+          <button id="nextMonth">&gt;</button>
+        </div>
+        <div class="calendar-days">
+          <div>일</div>
+          <div>월</div>
+          <div>화</div>
+          <div>수</div>
+          <div>목</div>
+          <div>금</div>
+          <div>토</div>
+        </div>
+        <div id="calendarDates" class="calendar-dates"></div>
+        <div class="input-area" id="inputArea" style="display: none; flex-direction: column; gap: 10px;">
+          <div id="nicknameListContainer">
+            <h4>친구 목록</h4>
+            <ul id="nicknameList"></ul>
+          </div>
+          <input type="text" id="shareNickname" placeholder="공유할 닉네임 (선택)">
+          <input type="text" id="eventInput" placeholder="일정 입력">
+          <button id="addEventBtn">추가</button>
+          <ul id="eventList" class="event-list"></ul>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <script src="./index.js" type="module"></script>
+  <script src="./friend.js" type="module"></script>
+</body>
+
+</html>
