@@ -398,6 +398,17 @@ const aboutModal = document.getElementById('aboutModal');
 const closeBtn = document.querySelector('.closeBtn');
 const guestInfo = document.getElementById('guest-info');
 
+const closeAboutModalBtn = document.getElementById('closeAboutModal');
+if (closeAboutModalBtn) {
+  closeAboutModalBtn.addEventListener('click', () => {
+    aboutModal.style.display = 'none';
+    if (!auth.currentUser && guestInfo) {
+      guestInfo.style.display = 'block';
+    }
+  });
+}
+
+
 aboutBtn.addEventListener('click', () => {
   aboutModal.style.display = 'block';
 
