@@ -1,5 +1,9 @@
 {
   "projects": {
+<<<<<<< HEAD
     "default": "v-talk-1f552"
+=======
+    "default": "your-project-id"
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
   }
 }

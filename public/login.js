@@ -1,9 +1,17 @@
+<<<<<<< HEAD
 import { auth, db, storage } from './firebase-config.js';
+=======
+import { auth, db } from './firebase-config.js';
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+<<<<<<< HEAD
   updateProfile
+=======
+  onAuthStateChanged
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
 import {
@@ -11,12 +19,15 @@ import {
   query, where, getDocs, collection
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
+<<<<<<< HEAD
 import {
   ref as storageRef,
   uploadBytes,
   getDownloadURL
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
 
+=======
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
 // ✅ 닉네임 유효성 검사
 function isValidNickname(nickname) {
   const regex = /^[a-zA-Z0-9가-힣_]{1,20}$/;
@@ -45,7 +56,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+<<<<<<< HEAD
         const user = userCredential.user;   // ✅ 이제 user.uid 사용 가능
+=======
+        const user = userCredential.user;
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
         window.newUser = user;
 
         // ✅ 닉네임 입력 모달 표시
@@ -100,6 +115,7 @@ if (loginSubmit) {
   });
 }
 
+<<<<<<< HEAD
 // ✅ 사용자 정보 Firestore + Storage에 저장
 async function saveUserProfile(user, nickname, file = null) {
   try {
@@ -145,12 +161,19 @@ async function saveUserProfile(user, nickname, file = null) {
 }
 
 // ✅ 닉네임 + 프로필 저장 버튼
+=======
+// ✅ 닉네임 + 프로필 저장
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
 const saveNicknameBtn = document.getElementById('saveNicknameBtn');
 if (saveNicknameBtn) {
   saveNicknameBtn.addEventListener('click', async () => {
     const nickname = document.getElementById('nicknameInput').value.trim();
     const user = window.newUser || window.existingUser;
     const fileInput = document.getElementById('profileImage');
+<<<<<<< HEAD
+=======
+    let photoURL = null;
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
 
     if (!nickname || !user) return;
 
@@ -165,11 +188,63 @@ if (saveNicknameBtn) {
       return;
     }
 
+<<<<<<< HEAD
     const file = fileInput?.files[0] || null;
     await saveUserProfile(user, nickname, file);
   });
 }
 
+=======
+    // ✅ 이미지 파일을 base64로 변환 (자동 리사이즈 적용)
+    if (fileInput && fileInput.files.length > 0) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const img = new Image();
+        img.onload = async function () {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+
+          const size = 100; // ✅ 100x100 고정 크기
+          canvas.width = size;
+          canvas.height = size;
+          ctx.drawImage(img, 0, 0, size, size);
+
+          const resizedBase64 = canvas.toDataURL('image/png', 0.8);
+          await saveUserProfile(user, nickname, resizedBase64);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    } else {
+      await saveUserProfile(user, nickname, null);
+    }
+  });
+}
+
+// ✅ 사용자 정보 Firestore에 저장
+async function saveUserProfile(user, nickname, photoURL = null) {
+  try {
+    const userDoc = {
+      email: user.email,
+      nickname: nickname,
+      createdAt: new Date()
+    };
+
+    if (photoURL) {
+      userDoc.photoURL = photoURL;
+    }
+
+    await setDoc(doc(db, 'users', user.uid), userDoc, { merge: true });
+
+    alert("닉네임 저장 완료!");
+    document.getElementById('nicknameModal').style.display = 'none';
+    window.location.href = 'index.html';
+  } catch (error) {
+    alert("닉네임 저장 실패: " + error.message);
+  }
+}
+
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
 // ✅ 비밀번호 재설정 처리
 const resetPassword = document.getElementById('resetPassword');
 if (resetPassword) {

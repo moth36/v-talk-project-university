@@ -1,24 +1,47 @@
+<<<<<<< HEAD
 import { auth, db, storage } from './firebase-config.js';
+=======
+import { auth, db } from './firebase-config.js';
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
 import {
   deleteUser,
   onAuthStateChanged,
   EmailAuthProvider,
+<<<<<<< HEAD
   reauthenticateWithCredential,
   updateProfile
+=======
+  reauthenticateWithCredential
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
 import {
   doc,
   updateDoc,
   deleteDoc,
+<<<<<<< HEAD
   getDoc,
+=======
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
   getDocs,
   collection
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
+<<<<<<< HEAD
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject, listAll }
   from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
 
+=======
+// Base64로 변환하는 함수
+function toBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+    reader.readAsDataURL(file);
+  });
+}
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
 
 // ---------------------- 계정 관리 ----------------------
 onAuthStateChanged(auth, (user) => {
@@ -34,7 +57,11 @@ onAuthStateChanged(auth, (user) => {
   const profilePhotoInput = document.getElementById('profilePhoto');
   const changePhotoBtn = document.getElementById('changePhotoBtn');
 
+<<<<<<< HEAD
   // ✅ 프로필 사진 변경 (Storage 방식)
+=======
+  // ✅ 프로필 사진 변경 (Firestore 방식)
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
   changePhotoBtn.addEventListener('click', async () => {
     const file = profilePhotoInput.files[0];
     if (!file) {
@@ -43,6 +70,7 @@ onAuthStateChanged(auth, (user) => {
     }
 
     try {
+<<<<<<< HEAD
       const ext = file.name.split('.').pop(); // 확장자 추출 (png, jpg 등)
       const fileRef = storageRef(storage, `profilePhotos/${user.uid}/profile.${ext}`);
       await uploadBytes(fileRef, file);
@@ -52,6 +80,19 @@ onAuthStateChanged(auth, (user) => {
       await updateDoc(doc(db, 'users', user.uid), { photoURL });
       await updateProfile(user, { photoURL });
 
+=======
+      // ✅ 파일 크기 확인 (1MB 이하 권장)
+      if (file.size > 1 * 1024 * 1024) {
+        alert("파일 크기가 너무 큽니다. 1MB 이하로 줄여주세요.");
+        return;
+      }
+
+      // ✅ Base64로 변환
+      const base64Image = await toBase64(file);
+
+      // ✅ Firestore에 저장
+      await updateDoc(doc(db, 'users', user.uid), { photoURL: base64Image });
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
       alert("프로필 사진이 변경되었습니다.");
     } catch (err) {
       console.error("프로필 사진 변경 실패:", err);
@@ -92,6 +133,7 @@ onAuthStateChanged(auth, (user) => {
   // ✅ 계정 삭제
   deleteBtn.addEventListener('click', async () => {
     const password = prompt("비밀번호를 입력하세요.");
+<<<<<<< HEAD
     const currentUser = auth.currentUser;
     if (!currentUser || !password) return;
 
@@ -134,6 +176,23 @@ onAuthStateChanged(auth, (user) => {
     } catch (err) {
       console.error("계정 삭제 실패:", err.message);
       alert("계정 삭제 실패: " + err.message);
+=======
+    const user = auth.currentUser;
+
+    if (user && password) {
+      const credential = EmailAuthProvider.credential(user.email, password);
+      try {
+        await reauthenticateWithCredential(user, credential);
+        await deleteDoc(doc(db, 'users', user.uid));
+        await deleteUser(user);
+
+        alert("계정이 완전히 삭제되었습니다.");
+        window.location.href = "index.html";
+      } catch (err) {
+        console.error("계정 삭제 실패:", err.message);
+        alert("계정 삭제 실패: " + err.message);
+      }
+>>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
     }
   });
 
