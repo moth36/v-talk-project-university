@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>설정 - V-Talk</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="settings.css" />
+</head>
+
+<body>
+  <div class="settings-container">
+    <h2>계정 설정</h2>
+
+    <!-- 프로필 사진 변경 -->
+    <label for="profilePhoto">프로필 사진 변경</label>
+    <input type="file" id="profilePhoto" accept="image/*" />
+    <button id="changePhotoBtn">프로필 사진 변경</button>
+    <br></br>
+
+    <!-- 닉네임 변경 -->
+    <label for="newNickname">닉네임 변경</label>
+    <input type="text" id="newNickname" placeholder="새 닉네임 입력" />
+    <button id="changeNicknameBtn">닉네임 변경</button>
+
+    <!-- 계정 삭제 -->
+    <button id="deleteAccountBtn" class="danger" style="margin-top: 20px;">계정 삭제</button>
+
+    <!-- 메인 화면 이동 -->
+    <button id="backBtn" class="back-btn">← 메인 화면으로 돌아가기</button>
+  </div>
+
+  <script type="module" src="settings.js"></script>
+</body>
+
+</html>
