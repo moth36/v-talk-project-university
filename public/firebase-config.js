@@ -10,7 +10,6 @@ import { getStorage } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-s
 // Firebase settings
 // Replace with your own Firebase project configuration
 const firebaseConfig = {
-<<<<<<< HEAD
   apiKey: "AIzaSyASOjfYQ8sbbM3E8zzR7m35zpJvklQ8gB0",
   authDomain: "v-talk-1f552.firebaseapp.com",
   databaseURL: "https://v-talk-1f552-default-rtdb.firebaseio.com",
@@ -18,15 +17,6 @@ const firebaseConfig = {
   storageBucket: "v-talk-1f552.firebasestorage.app",
   messagingSenderId: "563843573392",
   appId: "1:563843573392:web:4c3ce74bfe62ffded55a15"
-=======
-  apiKey: "your-api-key-here",
-  authDomain: "your-auth-domain-here",
-  databaseURL: "your-database-url-here",
-  projectId: "your-project-id-here",
-  storageBucket: "your-storage-bucket-here",
-  messagingSenderId: "your-messaging-sender-id-here",
-  appId: "your-app-id-here",
->>>>>>> 332968d355b441d804bc0156b4bd9e4204cc41b4
 };
 
 
