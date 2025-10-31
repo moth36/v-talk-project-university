@@ -1,0 +1,893 @@
+/* 전체 레이아웃 */
+
+body {
+    font-family: 'Inter', 'Pretendard', sans-serif;
+    margin: 0;
+    padding: 0;
+    padding-top: 100px;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #eaeef2;
+    background-size: 25px 25px;
+
+}
+
+.header {
+    height: 80px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    padding: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+}
+
+h1 {
+    font-size: 40px;
+}
+
+#mainContent {
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    gap: 20px;
+    width: 100%;
+    max-width: 1300px;
+    margin: 100x auto 0 auto;
+    transform: scale(0.8);
+    transform-origin: top center;
+}
+
+#profileMenu>* {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    background-color: #f9fafb;
+}
+
+.top-buttons {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.btn {
+    padding: 10px 20px;
+    background-color: #4865eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn:hover {
+    background-color: #17227c;
+}
+
+.section-container {
+    flex: 1;
+    background-color: white;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.section-container h3 {
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+#nicknameDisplay {
+    margin-right: 10px;
+    font-weight: bold;
+    font-size: 16px;
+    align-self: center;
+    color: #333;
+    pointer-events: auto;
+}
+
+.nickname-display {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-right: 10px;
+    align-self: center;
+}
+
+
+/* 유저 목록 박스 (음성유저, 채팅유저) */
+.user-box {
+    padding: 8px 12px;
+    background-color: #e0f7fa;
+    border-radius: 6px;
+    font-weight: bold;
+    color: #00796b;
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    margin: 5px;
+}
+
+.user-box:hover {
+    background-color: #b2ebf2;
+    box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* 채팅 입력 영역 */
+textarea {
+    width: 100%;
+    height: 150px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 14px;
+    resize: none;
+}
+
+input[type="text"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+#sendChatBtn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+#sendChatBtn:hover {
+    background-color: #0056b3;
+}
+
+.calendar-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border: 1px solid #ddd;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.calendar-header button {
+    padding: 6px 12px;
+    background-color: #4865eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.calendar-header button:hover {
+    background-color: #2d4373;
+}
+
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    font-weight: bold;
+    color: #333;
+}
+
+.calendar-dates {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-cell {
+    border: 1px solid #ccc;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+}
+
+.calendar-cell.today {
+    background-color: #f0f8ff;
+    border: 1px solid #0077ff;
+}
+
+.calendar-cell.selected {
+    background-color: #3b5998 !important;
+    color: white !important;
+    border: 2px solid #1a1a1a !important;
+}
+
+.calendar-cell.has-event {
+    background-color: #ffdddd;
+    border: 2px solid #ff4444;
+}
+
+.calendar-cell.shared-event {
+    background-color: #ffe0e0;
+    border: 1px dashed #b507fa;
+}
+
+.input-area {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.event-list {
+    list-style: none;
+    padding: 0;
+}
+
+.event-item {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+.delete-btn {
+    padding: 6px 12px;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #d9363e;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    position: relative;
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    width: 50%;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.closeBtn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.closeBtn:hover {
+    color: #999;
+}
+
+.sub-header {
+    max-width: 800px;
+    margin: 300px auto 0 auto;
+    font-size: 16px;
+    text-align: center;
+    color: #444;
+    line-height: 1.8;
+    padding: 0 20px;
+    position: relative;
+}
+
+@media (max-width: 768px) {
+    .header {
+        font-size: 20px;
+        padding: 16px;
+    }
+
+    .btn {
+        padding: 10px 18px;
+        font-size: 14px;
+    }
+
+    .calendar-container {
+        width: 100%;
+        right: 0;
+        left: 0;
+        border-radius: 0;
+    }
+
+    .sub-header {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        font-size: 18px;
+        padding: 12px;
+    }
+
+    .btn {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    textarea,
+    input[type="text"] {
+        font-size: 12px;
+        padding: 6px;
+    }
+
+    .calendar-cell {
+        height: 24px;
+    }
+}
+
+.friendTabBtn {
+    padding: 8px 16px;
+    background-color: #eee;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.friendTabBtn:hover {
+    background-color: #ddd;
+}
+
+.friendTabPage input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-right: 10px;
+}
+
+.friendTabPage button {
+    padding: 8px 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.friendTabPage button:hover {
+    background-color: #0056b3;
+}
+
+.closeFriendModal {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.closeFriendModal:hover {
+    color: #999;
+}
+
+/* ✅ 프로필 스타일 */
+#profileDisplay {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f0f0f0;
+    position: relative;
+}
+
+#profileDisplay img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* 상태 표시 (온라인/자리비움/오프라인) */
+.profile-status {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.status-online {
+    background-color: #00c853;
+}
+
+.status-away {
+    background-color: #ffab00;
+}
+
+.status-offline {
+    background-color: #ccc;
+}
+
+/* ✅ 밝은 테마용 사이드 프로필 */
+#profileWrapper {
+    background-color: #ffffff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #333;
+    width: 220px;
+    flex-direction: row;
+    border: 1px solid #ddd;
+}
+
+#profileWrapper span#profileNickname {
+    font-weight: 600;
+    font-size: 16px;
+    color: #222;
+}
+
+#profileWrapper a {
+    color: #007bff;
+    font-size: 13px;
+    text-decoration: none;
+    margin-top: 2px;
+}
+
+#profileWrapper a:hover {
+    text-decoration: underline;
+}
+
+/* ✅ 메뉴 스타일 */
+#profileMenu {
+    position: absolute;
+    top: 72px;
+    right: 1px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 12px;
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1001;
+    overflow: hidden;
+    margin-top: 5px;
+    transition: height 0.3s ease;
+}
+
+.profile-menu-link,
+.profile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px 0px;
+    margin: 4px 0;
+    background-color: #f5f5f5;
+    border-radius: 12px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: none;
+    width: 225px;
+}
+
+.profile-menu-link:hover,
+.profile-menu-btn:hover {
+    background-color: #e9e9e9;
+}
+
+/* ✅ 설정 버튼에 대한 추가 스타일 */
+.profile-menu-link {
+    cursor: pointer;
+}
+
+.profile-menu-link:hover {
+    background-color: #eaeaea;
+    color: #0056b3;
+}
+
+.btn:hover {
+    background-color: #2d4373;
+}
+
+/* ✅ 프로필 스타일 */
+#profileWrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#profileDisplay {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#profileDisplay img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ✅ 프로필 사진 업로드 스타일 */
+#profilePhoto {
+    margin-bottom: 14px;
+}
+
+#changePhotoBtn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    margin-top: 6px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#changePhotoBtn:hover {
+    background-color: #0056b3;
+}
+
+/* 채팅방 삭제버튼 */
+
+.delete-btn {
+    padding: 4px 8px;
+    font-size: 14px;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-btn:hover {
+    background-color: #d9363e;
+}
+
+.main-layout {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    max-width: 1300px;
+    margin: 120px auto 0 auto;
+    align-items: stretch;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 250px;
+    flex-shrink: 0;
+}
+
+
+.chat-main {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+}
+
+.chat-box {
+    height: 450px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 6px;
+    background-color: #fff;
+}
+
+.chat-input {
+    display: flex;
+    gap: 8px;
+}
+
+/* 채팅방 만들기, 친구초대 버튼 */
+
+.btn-action {
+    padding: 8px 14px;
+    font-size: 14px;
+    white-space: nowrap;
+    background-color: #4865eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.chat-header-buttons {
+    display: flex;
+    gap: 20px;
+}
+
+/* 채팅방 항목 정리 */
+#myRoomsList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background-color: #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+    margin-bottom: 12px;
+    font-size: 15px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+#myRoomsList li span {
+    flex: 1;
+    white-space: nowrap;
+}
+
+/* 삭제 버튼 */
+#myRoomsList .delete-btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-left: 12px;
+}
+
+#myRoomsList .delete-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* 음성채팅 컨트롤 줄 */
+#audio-controls {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin: 14px 0;
+}
+
+#audio-chat-status {
+    font-size: 14px;
+    color: #555;
+    margin-left: auto;
+}
+
+/* 파일 버튼 정돈 */
+#fileControls {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+}
+
+#uploadBtn,
+#showFilesBtn {
+    padding: 8px 14px;
+    background-color: #4865eb;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+#uploadBtn:hover,
+#showFilesBtn:hover {
+    background-color: #2d4373;
+}
+
+
+/* 파일 이름 표시 */
+#fileNameDisplay {
+    font-size: 14px;
+    color: #444;
+    margin-top: 8px;
+}
+
+/* 음성채팅 버튼 줄 정리 */
+#audio-chat-status {
+    font-size: 14px;
+    margin-left: 12px;
+    color: #555;
+    align-self: center;
+}
+
+#startAudioChatBtn,
+#endAudioChatBtn {
+    min-width: 120px;
+}
+
+/* 멤버 목록 스타일 */
+#memberList li {
+    padding: 8px 12px;
+    background-color: #f0f4f8;
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+/* ✅ 파일 업로드/목록 버튼 그룹 */
+#uploadBtn,
+#showFilesBtn {
+    padding: 8px 16px;
+    margin-top: 8px;
+    margin-right: 8px;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+#fileNameDisplay {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #555;
+}
+
+/* ✅ 채팅 입력 영역 */
+.chat-input {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    width: 100%;
+}
+
+#chatInput {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.chat-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 10px 0;
+}
+
+.chat-message.me {
+    align-items: flex-end;
+}
+
+.nickname-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 4px;
+}
+
+
+.chat-message.you {
+    justify-content: flex-start;
+    flex-direction: row;
+}
+
+.bubble {
+    max-width: 70%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.chat-message.me .bubble {
+    background-color: #cce2ff;
+    color: #003366;
+    border-bottom-right-radius: 0;
+}
+
+.chat-message.you .bubble {
+    background-color: #f0f0f0;
+    color: #222;
+    border-bottom-left-radius: 0;
+}
+
+#videoContainer video {
+    width: 100%;
+    object-fit: contain;
+    display: flex;
+}
+
+.localvideo {
+    width: 100%;
+}
+
+.remotevideo {
+    width: 100%;
+}
+
+.hidden {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.chat-alert {
+    padding: 8px;
+    margin: 8px 0;
+    background-color: #f1f5ff;
+    border: 1px solid #d0d9ff;
+    border-radius: 6px;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-alert button {
+    padding: 4px 10px;
+    background-color: #4865eb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.chat-alert button:hover {
+    background-color: #2d4373;
+}
+
+.stopVideoBtn {
+    padding: 4px 10px;
+    background-color: #f44336;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.stopVideoBtn:hover {
+    background-color: #d32f2f;
+}

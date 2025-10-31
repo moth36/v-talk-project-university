@@ -1,0 +1,104 @@
+/* ✅ 전체 레이아웃 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f9;
+}
+
+/* ✅ 로그인 폼 스타일 */
+.form-log-in {
+    width: 320px;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+/* ✅ 입력 필드 스타일 */
+.input-field {
+    margin-bottom: 20px;
+    margin-right: 20px;
+}
+
+.label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* ✅ 버튼 그룹 스타일 */
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.button {
+    flex: 1;
+    padding: 10px;
+    background-color: #3b5998;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.button:hover {
+    background-color: #2d4373;
+}
+
+/* ✅ 비밀번호 재설정 링크 */
+.text-link {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.forgot-password {
+    color: #3b5998;
+    cursor: pointer;
+}
+
+.forgot-password:hover {
+    text-decoration: underline;
+}
+
+/* ✅ 반응형 설정 */
+@media (max-width: 768px) {
+    .form-log-in {
+        width: 90%;
+    }
+}
+
+/* ✅ 닉네임 모달 스타일 */
+.modal {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+  
+  .modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 300px;
+    text-align: center;
+  }
+  
+  
