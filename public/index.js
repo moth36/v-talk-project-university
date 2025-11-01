@@ -1,6 +1,3 @@
-//──────────────────────────────────────────────────────────────────────────────
-// index.js (화상회의 제거 + 화면 공유만)
-//──────────────────────────────────────────────────────────────────────────────
 // ── 화면 공유 관련 버튼 가져오기 ──
 const startScreenShareBtn = document.getElementById("startScreenShareBtn");
 const endScreenShareBtn = document.getElementById("endScreenShareBtn");
