@@ -27,6 +27,7 @@ import {
   getDocs,
   updateDoc,
   arrayUnion,
+  arrayRemove,
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
 import {
@@ -1415,106 +1416,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // ******************************** 이거 추가하면 처음에 불러오는데 실패했다 뜨는데 F12 누르고 오류 메시지의 링크 누르면 파이어베이스 홈페이지에 색인으로 이동됨 저장 누르고 기다리다가 완료 뜨면 그때부터 파일 목록 보일거야
 
 // 파일 업로드 및 공유 파일 다운로드
-
-async function loadMyRoomsWithMemberClick() {
-  const userNickname = sessionStorage.getItem("nickname");
-  const q = query(collection(db, "chatRooms"), where("members", "array-contains", userNickname));
-  const snapshot = await getDocs(q);
-
-  myRoomsList.innerHTML = '';
-
-  const currentRoomNameEl = document.getElementById("currentRoomName");
-  const chatBox = document.getElementById("chatBox");
-  const memberList = document.getElementById("memberList");
-
-  //  채팅방이 없을 때
-  if (snapshot.empty) {
-    const emptyMsg = document.createElement('li');
-    emptyMsg.textContent = "채팅방이 없습니다";
-    emptyMsg.style.color = "#777";
-    myRoomsList.appendChild(emptyMsg);
-
-    if (currentRoomNameEl) currentRoomNameEl.textContent = "채팅방을 만들어보세요!";
-    if (chatBox) chatBox.innerHTML = '<p style="color:#888;">메시지를 주고받으려면 먼저 채팅방을 만들어야 합니다.</p>';
-    if (memberList) memberList.innerHTML = '';
-    return;
-  }
-
-  //채팅방 선택하기 전
-  if (currentRoomNameEl) currentRoomNameEl.textContent = "채팅방을 선택해 주세요";
-  if (chatBox) chatBox.innerHTML = '<p style="color:#888;">채팅방을 선택해 주세요</p>';
-  if (memberList) memberList.innerHTML = '';
-
-  snapshot.forEach(docSnap => {
-    const room = docSnap.data();
-    const roomId = docSnap.id;
-
-    const li = document.createElement('li');
-
-    const titleSpan = document.createElement('span');
-    titleSpan.textContent = room.title;
-    titleSpan.style.flex = "1";
-    li.appendChild(titleSpan);
-
-    const myNickname = sessionStorage.getItem("nickname");
-
-    if (room.createdBy === myNickname) {
-      const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = '삭제';
-      deleteBtn.style.marginLeft = '10px';
-      deleteBtn.classList.add('delete-btn');
-
-      deleteBtn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        const confirmDelete = confirm(`"${room.title}"정말 채팅방을 삭제하시겠습니까?`);
-        if (!confirmDelete) return;
-
-        await deleteDoc(doc(db, "chatRooms", roomId));
-        loadMyRoomsWithMemberClick();
-      });
-
-      li.appendChild(deleteBtn);
-    }
-
-    myRoomsList.appendChild(li);
-
-    // 채팅방 클릭 시
-    li.addEventListener("click", async () => {
-      currentRoomId = roomId;
-      cleanupVoiceChatData();
-
-      currentRoomNameEl.textContent = `채팅방: ${room.title}`;
-      loadChatMessages(currentRoomId);
-      memberList.innerHTML = '';
-
-      const roomDocSnap = await getDoc(doc(db, "chatRooms", currentRoomId));
-      if (!roomDocSnap.exists()) {
-        memberList.innerHTML = "<li>채팅방 정보를 찾을 수 없습니다.</li>";
-        return;
-      }
-
-      const roomData = roomDocSnap.data();
-      const members = roomData.members || [];
-      const createdBy = roomData.createdBy;
-
-      if (members.length === 0) {
-        memberList.innerHTML = "<li>채팅방에 멤버가 없습니다.</li>";
-        return;
-      }
-
-      for (const member of members) {
-        const li = document.createElement("li");
-        if (member === createdBy) {
-          li.innerHTML = `👑 <strong>${member}</strong> (관리자)`;
-        } else {
-          li.textContent = member;
-        }
-        memberList.appendChild(li);
-      }
-      setupVideoShareListener();
-    });
-  });
-}
 
 // 9. WebRTC 전역 변수 정의 (PeerConnection 관리)
 //──────────────────────────────────────────────────────────────────────────────
