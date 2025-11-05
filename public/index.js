@@ -563,8 +563,8 @@ async function loadMyRoomsWithMemberClick() {
 
       const roomDocSnap = await getDoc(doc(db, "chatRooms", currentRoomId));
       if (!roomDocSnap.exists()) {
-          memberList.innerHTML = "<li>채팅방 정보를 찾을 수 없습니다.</li>";
-          return;
+        memberList.innerHTML = "<li>채팅방 정보를 찾을 수 없습니다.</li>";
+        return;
       }
 
       const roomData = roomDocSnap.data();
@@ -573,40 +573,40 @@ async function loadMyRoomsWithMemberClick() {
       const myNickname = sessionStorage.getItem("nickname");
 
       if (members.length === 0) {
-          memberList.innerHTML = "<li>채팅방에 멤버가 없습니다.</li>";
-          return;
+        memberList.innerHTML = "<li>채팅방에 멤버가 없습니다.</li>";
+        return;
       }
 
       // ✅ 멤버를 표시하고 추방 버튼을 추가하는 단일 for 루프
       for (const member of members) {
-          const li = document.createElement("li");
-          if (member === createdBy) {
-              li.innerHTML = `👑 <strong>${member}</strong> (관리자)`;
-          } else {
-              li.textContent = member;
-          }
+        const li = document.createElement("li");
+        if (member === createdBy) {
+          li.innerHTML = `👑 <strong>${member}</strong> (관리자)`;
+        } else {
+          li.textContent = member;
+        }
 
-          if (myNickname === createdBy && member !== myNickname) {
-              const kickBtn = document.createElement('button');
-              kickBtn.textContent = '추방';
-              kickBtn.classList.add('delete-btn');
-              kickBtn.style.marginLeft = '8px';
+        if (myNickname === createdBy && member !== myNickname) {
+          const kickBtn = document.createElement('button');
+          kickBtn.textContent = '추방';
+          kickBtn.classList.add('delete-btn');
+          kickBtn.style.marginLeft = '8px';
 
-              kickBtn.addEventListener('click', async (e) => {
-                  e.stopPropagation();
-                  const confirmKick = confirm(`${member}님을 채팅방에서 추방하시겠습니까?`);
-                  if (confirmKick) {
-                      const roomRef = doc(db, "chatRooms", currentRoomId);
-                      await updateDoc(roomRef, {
-                          members: arrayRemove(member)
-                      });
-                      alert(`${member}님이 추방되었습니다.`);
-                  }
+          kickBtn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            const confirmKick = confirm(`${member}님을 채팅방에서 추방하시겠습니까?`);
+            if (confirmKick) {
+              const roomRef = doc(db, "chatRooms", currentRoomId);
+              await updateDoc(roomRef, {
+                members: arrayRemove(member)
               });
-              li.appendChild(kickBtn);
-          }
+              alert(`${member}님이 추방되었습니다.`);
+            }
+          });
+          li.appendChild(kickBtn);
+        }
 
-          memberList.appendChild(li);
+        memberList.appendChild(li);
       }
     });
   });
@@ -765,6 +765,36 @@ function loadChatMessages(roomId) {
         chatMessages.appendChild(wrapper);
         return;
       }
+
+      // ✅ [1.2] 화상 공유 알림 메시지
+      if (data.type === "video-share") {
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("chat-message", "system-message");
+
+        const bubble = document.createElement("div");
+        bubble.classList.add("bubble");
+        bubble.innerHTML = `<strong>[알림]</strong> ${data.message}`;
+
+        // “보기” 버튼 추가 (시작 알림일 경우만)
+        if (data.isStreamAlert && data.streamType === "video" && data.newUid) {
+          const btn = document.createElement("button");
+          btn.textContent = "보기";
+          btn.classList.add("btn", "btn-sm");
+          btn.style.marginLeft = "8px";
+
+          // 보기 버튼 클릭 시 joinVideoChat 실행
+          btn.addEventListener("click", () => {
+            joinVideoChat(data.newUid);
+          });
+
+          bubble.appendChild(btn);
+        }
+
+        wrapper.appendChild(bubble);
+        chatMessages.appendChild(wrapper);
+        return;
+      }
+
 
       // ✅ [1.5] 영상/화면 공유 알림 메시지는 일반 채팅으로 출력하지 않음
       if (data.type === "video-share" || data.type === "screen-share") {
@@ -2457,3 +2487,5 @@ async function clearVideoChatData(roomId) {
     console.warn("❌ clearVideoChatData 오류:", e);
   }
 }
+// 전역 함수로 등록
+window.joinVideoChat = joinVideoChat;
