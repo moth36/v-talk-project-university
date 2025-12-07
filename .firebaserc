@@ -1,5 +1,9 @@
 {
   "projects": {
+<<<<<<< HEAD
     "default": "your-project-id"  
+=======
+  "default": "your-project-id"
+>>>>>>> c87f69189af1581a5eeb47e05596c4f5d2486ed5
   }
 }
