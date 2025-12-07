@@ -7,6 +7,7 @@ const endVideoChatBtn = document.getElementById("endVideoChatBtn");
 const videoChatStatus = document.getElementById("video-chat-status");
 // 뷰어 “보기 중지” 버튼으로도 재활용
 const stopViewBtn = endScreenShareBtn;
+
 import { auth, db, app, storage, firestore, database } from './firebase-config.js';
 import { sendFriendRequest, getFriends } from './friend.js';
 import {
@@ -52,6 +53,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-storage.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+
 // ---------------------- 프로필 UID 기반 색상 설정 함수 ----------------------
 function getColorFromUID(uid) {
   const bgColors = ["#ff8a80", "#82b1ff", "#b9f6ca", "#f48fb1", "#ce93d8", "#80deea", "#a5d6a7", "#e6ee9c"];
@@ -658,9 +660,9 @@ function loadChatMessages(roomId) {
             viewerOfferListener = null;
             viewerCandidateListener = null;
 
-            if (peerConnectionsByRoom[roomId]?.[data.senderUid]) {
-              peerConnectionsByRoom[roomId][data.senderUid].close();
-              delete peerConnectionsByRoom[roomId][data.senderUid];
+            if (screenPeerConnections[roomId]?.[data.senderUid]) {
+              screenPeerConnections[roomId][data.senderUid].close();
+              delete screenPeerConnections[roomId][data.senderUid];
             }
 
             // 🔁 screenShareUsers 재등록
@@ -739,9 +741,9 @@ function loadChatMessages(roomId) {
 
               await remove(ref(database, `screenShareUsers/${roomId}/${myUid}`));
 
-              if (peerConnectionsByRoom[roomId]) {
-                Object.values(peerConnectionsByRoom[roomId]).forEach(pc => pc.close());
-                delete peerConnectionsByRoom[roomId];
+              if (screenPeerConnections[roomId]) {
+                Object.values(screenPeerConnections[roomId]).forEach(pc => pc.close());
+                delete screenPeerConnections[roomId];
               }
 
               newBtn.style.display = "none";
@@ -1051,7 +1053,11 @@ const audioChatStatus = document.getElementById("audio-chat-status");
 
 // 상태 변수들
 let localStream = null;            // 자신의 오디오 스트림
-let peerConnectionsByRoom = {};    // 상대방과의 WebRTC 연결 객체 저장
+// [수정됨] 전역 변수 분리
+let audioPeerConnections = {};  
+let screenPeerConnections = {};
+// videoPeerConnections는 아래 화상채팅 섹션에 선언됨
+
 let isListening = false;           // Firebase 이벤트 중복 리스닝 방지
 
 // 내 오디오 트랙을 PeerConnection에 추가
@@ -1099,14 +1105,16 @@ async function createPeerConnection(remoteUserId, roomId, offersRef, iceCandidat
     iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
   });
 
-  if (!peerConnectionsByRoom[currentRoomId]) {
-    peerConnectionsByRoom[currentRoomId] = {};
-  } else {
-    Object.values(peerConnectionsByRoom[currentRoomId]).forEach(pc => pc.close());
-    peerConnectionsByRoom[currentRoomId] = {};
+  // [수정됨] 방이 없으면 생성하고, 방이 있을 때는 해당 유저와의 기존 연결만 정리
+  if (!audioPeerConnections[currentRoomId]) {
+    audioPeerConnections[currentRoomId] = {};
+  }
+  if (audioPeerConnections[currentRoomId][remoteUserId]) {
+     // 기존에 해당 유저와 연결된 것이 있다면 닫고 새로 생성
+     audioPeerConnections[currentRoomId][remoteUserId].close();
   }
 
-  peerConnectionsByRoom[currentRoomId][remoteUserId] = pc;
+  audioPeerConnections[currentRoomId][remoteUserId] = pc;
 
   try {
     attachLocalTracksTo(pc);
@@ -1131,7 +1139,7 @@ async function handleReceivedOffer(offerData, iceCandidatesRef, offersRef) {
   const pc = new RTCPeerConnection({
     iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
   });
-  peerConnectionsByRoom[currentRoomId][offerData.sender] = pc;
+  audioPeerConnections[currentRoomId][offerData.sender] = pc;
   attachLocalTracksTo(pc);
   setupPeerConnectionEvents(pc, offerData.sender, iceCandidatesRef);
 
@@ -1165,11 +1173,12 @@ async function startVoiceChat() {
 
   if (!currentRoomId) return alert("채팅방을 먼저 선택하세요.");
 
-  if (!peerConnectionsByRoom[currentRoomId]) {
-    peerConnectionsByRoom[currentRoomId] = {};
+  if (!audioPeerConnections[currentRoomId]) {
+    audioPeerConnections[currentRoomId] = {};
   } else {
-    Object.values(peerConnectionsByRoom[currentRoomId]).forEach(pc => pc.close());
-    peerConnectionsByRoom[currentRoomId] = {};
+    // 기존 연결이 혹시 남아있다면 정리
+    Object.values(audioPeerConnections[currentRoomId]).forEach(pc => pc.close());
+    audioPeerConnections[currentRoomId] = {};
   }
 
 
@@ -1180,10 +1189,10 @@ async function startVoiceChat() {
   try {
     localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    // 끊긴 연결 정리
-    for (const [uid, pc] of Object.entries(peerConnectionsByRoom[currentRoomId])) {
+    // 끊긴 연결 정리 (안전장치)
+    for (const [uid, pc] of Object.entries(audioPeerConnections[currentRoomId])) {
       if (pc.connectionState === "closed" || pc.iceConnectionState === "disconnected") {
-        delete peerConnectionsByRoom[currentRoomId][uid];
+        delete audioPeerConnections[currentRoomId][uid];
       }
     }
 
@@ -1219,7 +1228,7 @@ async function startVoiceChat() {
       // 새로운 사용자 접속 감지
       onChildAdded(voiceChatUsersRef, (snapshot) => {
         const remoteUserId = snapshot.key;
-        if (remoteUserId !== userId && !peerConnectionsByRoom[currentRoomId][remoteUserId]) {
+        if (remoteUserId !== userId && !audioPeerConnections[currentRoomId][remoteUserId]) {
           if (userId < remoteUserId) {
             createPeerConnection(remoteUserId, currentRoomId, offersRef, iceCandidatesRef);
           }
@@ -1229,9 +1238,9 @@ async function startVoiceChat() {
       // 사용자 나감 감지
       onChildRemoved(voiceChatUsersRef, (snapshot) => {
         const removedId = snapshot.key;
-        if (peerConnectionsByRoom[currentRoomId][removedId]) {
-          peerConnectionsByRoom[currentRoomId][removedId].close();
-          delete peerConnectionsByRoom[currentRoomId][removedId];
+        if (audioPeerConnections[currentRoomId][removedId]) {
+          audioPeerConnections[currentRoomId][removedId].close();
+          delete audioPeerConnections[currentRoomId][removedId];
         }
       });
 
@@ -1245,9 +1254,9 @@ async function startVoiceChat() {
         } else if (
           offerData.type === "answer" &&
           offerData.receiver === userId &&
-          peerConnectionsByRoom[currentRoomId][offerData.sender]
+          audioPeerConnections[currentRoomId][offerData.sender]
         ) {
-          const pc = peerConnectionsByRoom[currentRoomId][offerData.sender];
+          const pc = audioPeerConnections[currentRoomId][offerData.sender];
           if (!pc.remoteDescription) {
             await pc.setRemoteDescription(new RTCSessionDescription(offerData));
           }
@@ -1263,7 +1272,7 @@ async function startVoiceChat() {
           candidateData.sdpMid !== undefined &&
           candidateData.sdpMLineIndex !== undefined
         ) {
-          const pc = peerConnectionsByRoom[currentRoomId][candidateData.sender];
+          const pc = audioPeerConnections[currentRoomId][candidateData.sender];
           if (pc) {
             if (pc.remoteDescription) {
               await pc.addIceCandidate(new RTCIceCandidate(candidateData));
@@ -1317,9 +1326,9 @@ function cleanupVoiceChatData() {
   });
 
   // 연결 닫기
-  if (peerConnectionsByRoom[currentRoomId]) {
-    Object.values(peerConnectionsByRoom[currentRoomId]).forEach(pc => pc.close());
-    peerConnectionsByRoom[currentRoomId] = {};
+  if (audioPeerConnections[currentRoomId]) {
+    Object.values(audioPeerConnections[currentRoomId]).forEach(pc => pc.close());
+    audioPeerConnections[currentRoomId] = {};
   }
 
   audioChatStatus.textContent = "음성 채팅 상태: 대기 중";
@@ -1440,7 +1449,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // 버튼 클릭 시 함수 연결
   showFilesBtn.addEventListener('click', loadUploadedFiles);
 });
-// ******************************** 이거 추가하면 처음에 불러오는데 실패했다 뜨는데 F12 누르고 오류 메시지의 링크 누르면 파이어베이스 홈페이지에 색인으로 이동됨 저장 누르고 기다리다가 완료 뜨면 그때부터 파일 목록 보일거야
+
 
 // 파일 업로드 및 공유 파일 다운로드
 
@@ -1458,14 +1467,15 @@ let screenOffersListener = null;
 let screenUsersRemovedListener = null;
 
 function createOrReuseConnection(remoteUserId, roomId, streamType = "screen") {
-  if (!peerConnectionsByRoom[roomId]) peerConnectionsByRoom[roomId] = {};
-  if (!peerConnectionsByRoom[roomId][remoteUserId]) {
+  // [수정됨] screenPeerConnections 변수 사용
+  if (!screenPeerConnections[roomId]) screenPeerConnections[roomId] = {};
+  if (!screenPeerConnections[roomId][remoteUserId]) {
     const pc = new RTCPeerConnection({
       iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
     });
     const icePath = streamType === "screen"
       ? `screenShareCandidates/${roomId}`
-      : `voiceChatCandidates/${roomId}`;
+      : `voiceChatCandidates/${roomId}`; // ※ streamType이 screen이 아닐 경우 voiceChatCandidates를 쓰는데, 화면 공유 로직에서는 screen만 쓰므로 문제없음
     pc.onicecandidate = event => {
       if (!event.candidate) return;
       push(ref(database, icePath), {
@@ -1516,9 +1526,9 @@ function createOrReuseConnection(remoteUserId, roomId, streamType = "screen") {
         await origAddIce(new RTCIceCandidate(candInit));
       }
     };
-    peerConnectionsByRoom[roomId][remoteUserId] = pc;
+    screenPeerConnections[roomId][remoteUserId] = pc;
   }
-  return peerConnectionsByRoom[roomId][remoteUserId];
+  return screenPeerConnections[roomId][remoteUserId];
 }
 
 
@@ -1553,13 +1563,13 @@ endScreenShareBtn.addEventListener("click", async () => {
     endScreenShareBtn.disabled = true;
     endScreenShareBtn.style.display = "none";
 
-    // 4) PeerConnection 정리 (선택 사항)
-    if (peerConnectionsByRoom[currentRoomId]) {
-      Object.values(peerConnectionsByRoom[currentRoomId]).forEach(pc => {
+    // 4) PeerConnection 정리
+    if (screenPeerConnections[currentRoomId]) {
+      Object.values(screenPeerConnections[currentRoomId]).forEach(pc => {
         pc.getSenders().forEach(s => s.track && s.track.stop());
         pc.close();
       });
-      delete peerConnectionsByRoom[currentRoomId];
+      delete screenPeerConnections[currentRoomId];
     }
   }
 });
@@ -1676,12 +1686,12 @@ async function stopScreenShare() {
   document.getElementById("videoContainer").style.display = "none";
 
   // (4) PeerConnection 정리
-  if (peerConnectionsByRoom[currentRoomId]) {
-    Object.values(peerConnectionsByRoom[currentRoomId]).forEach(pc => {
+  if (screenPeerConnections[currentRoomId]) {
+    Object.values(screenPeerConnections[currentRoomId]).forEach(pc => {
       pc.getSenders().forEach(s => s.track && s.track.stop());
       pc.close();
     });
-    delete peerConnectionsByRoom[currentRoomId];
+    delete screenPeerConnections[currentRoomId];
   }
 
   screenSignalingInitialized = false;
@@ -1814,9 +1824,9 @@ function setupScreenSignalingListeners() {
       startScreenShareBtn.disabled = false;
       endScreenShareBtn.disabled = true;
 
-      if (peerConnectionsByRoom[currentRoomId]) {
-        Object.values(peerConnectionsByRoom[currentRoomId]).forEach(pc => pc.close());
-        delete peerConnectionsByRoom[currentRoomId];
+      if (screenPeerConnections[currentRoomId]) {
+        Object.values(screenPeerConnections[currentRoomId]).forEach(pc => pc.close());
+        delete screenPeerConnections[currentRoomId];
       }
 
       currentScreenHostUid = null;
@@ -1888,9 +1898,9 @@ function startScreenViewerListeners() {
       startScreenShareBtn.disabled = false;
       endScreenShareBtn.disabled = true;
 
-      if (peerConnectionsByRoom[currentRoomId]) {
-        Object.values(peerConnectionsByRoom[currentRoomId]).forEach(pc => pc.close());
-        delete peerConnectionsByRoom[currentRoomId];
+      if (screenPeerConnections[currentRoomId]) {
+        Object.values(screenPeerConnections[currentRoomId]).forEach(pc => pc.close());
+        delete screenPeerConnections[currentRoomId];
       }
 
       currentScreenHostUid = null;
